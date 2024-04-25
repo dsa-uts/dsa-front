@@ -1,20 +1,26 @@
 import axios from 'axios';
 import { LoginCredentials, CreateUser } from '../types/user';
 import { Token } from '../types/token';
+import { UploadResponse } from '../types/Assignments';
 import { ProgressMessage } from '../types/Assignments';
 
 const API_PREFIX = 'http://localhost:8000/api/v1';
 // ファイルをアップロードする関数(多分uploadFileWithProgressに切り替える)
-export const uploadFile = async (file: File, id: number, sub_id: number): Promise<string> => {
+export const uploadFile = async (file: File, id: number, sub_id: number): Promise<UploadResponse> => {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("upload_file", file);
     try {
         const response = await axios.post(`${API_PREFIX}/assignments/upload/${id}/${sub_id}`, formData, {
             headers: {
             "Content-Type": "multipart/form-data",
             },
         });
-        return response.data.filename; // uuidが付加されたファイル名を返す
+        const uploadResponse: UploadResponse = {
+            unique_id: response.data.unique_id,
+            filename: response.data.filename,
+            result: response.data.result,
+        };
+        return uploadResponse;
     } catch (error) {
         throw error; // エラーを呼び出し元に伝播させる
     }

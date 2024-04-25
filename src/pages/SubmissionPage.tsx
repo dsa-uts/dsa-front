@@ -71,7 +71,7 @@ const SubmissionPage: React.FC = () => {
 					</ul>
 					<h3>テストに使用するmainファイル</h3>
 					{subAssignmentDetail.test_program ? (
-						<Accordion title={subAssignmentDetail.test_file_name} content={subAssignmentDetail.test_program.split('\n')} />
+						<Accordion title={subAssignmentDetail.main_file_name} content={subAssignmentDetail.test_program.split('\n')} />
 					) : (
 						<div style={{ color: 'red' }}>データの取得に失敗しました．リロードしても失敗する場合はTAに連絡してください．</div>
 					)}

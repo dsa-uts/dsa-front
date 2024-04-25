@@ -9,6 +9,7 @@ interface WebSocketCallbacks {
 export const startProcessingWithProgress = (
     id: number,
     sub_id: number,
+    unique_id: string,
     filename: string,
     { onProgress }: WebSocketCallbacks
 ) => {
@@ -36,8 +37,8 @@ export const startProcessingWithProgress = (
 
     ws.onopen = () => {
         // WebSocket接続が開かれたら、filenameを送信
-        ws.send(JSON.stringify({ filename }));
-        setTimeout(checkHeartbeat, 10000);  // 接続後10秒後に最初のハートビートチェックを開始
+        ws.send(JSON.stringify({ filename, unique_id }));
+        setTimeout(checkHeartbeat, 10000);  // 接続後10秒後にハートビートを開始
     };
 
     ws.onmessage = (event) => {

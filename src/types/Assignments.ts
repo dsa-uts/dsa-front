@@ -13,7 +13,7 @@ export type SubAssignment = {
     title: string;
     makefile: string;
     required_file_name: string;
-    test_file_name: string;
+    main_file_name: string;
     test_input: string;
     test_output: string;
     test_program: string;
@@ -23,12 +23,18 @@ export type SubAssignment = {
 export type SubAssignmentDropdown = Pick<SubAssignment, 'id' | 'sub_id' | 'title'>;
 
 // 選択された後に表示する情報用の型定義
-export type SubAssignmentDetail = Pick<SubAssignment, 'id' | 'sub_id' | 'makefile' | 'required_file_name' | 'test_file_name' | 'test_input' | 'test_output' | 'test_program'>;
+export type SubAssignmentDetail = Pick<SubAssignment, 'id' | 'sub_id' | 'makefile' | 'required_file_name' | 'main_file_name' | 'test_input' | 'test_output' | 'test_program'>;
 
 export type ProgressMessage = {
     status: string;
     message: string;
     progress_percentage: number;
     result?: { [key: string]: any }; 
+};
+
+export type UploadResponse = {
+  unique_id: string;
+  filename: string;
+  result: string;
 };
 

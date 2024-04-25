@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { uploadFile } from '../api/PostAPI';
 import { startProcessingWithProgress } from '../api/WebSocketAPI';
-import { ProgressMessage } from '../types/Assignments';
+import { ProgressMessage, UploadResponse } from '../types/Assignments';
 interface FileUploadProps {
     id: number;
     sub_id: number;
@@ -59,11 +59,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
         event.preventDefault();
         if (file && isNameCorrect) {
             try {
-                const filename = await uploadFile(file, id, sub_id);
+                const response: UploadResponse = await uploadFile(file, id, sub_id);
+                const unique_id = response.unique_id;
+                const filename = response.filename;
                 // WebSocket 通信を開始し、進行状況を受信
                 startProcessingWithProgress(
                     id,
                     sub_id,
+                    unique_id,
                     filename,
                     {
                         onProgress: (progress) => {
