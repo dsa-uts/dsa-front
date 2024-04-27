@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Sidebar from './components/Sidebar';
 import SubmissionPage from './pages/SubmissionPage';
-import RegisterPage from './pages/UserRegisterationPage';
 import LoginPage from './pages/LoginPage';
-import UserDeletePage from './pages/UserDeletePage';
+import AdminRoutes from './routes/AdminRoutes';
 import { useAuth } from './context/AuthContext';
 
 
@@ -30,9 +29,8 @@ const App: React.FC = () => {
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/submission/:problemNum" element={<SubmissionPage />} />
-						<Route path="/users/register" element={<RegisterPage />} />
 						<Route path="/login" element={<LoginPage />} />
-						<Route path="/users/delete" element={<UserDeletePage />} />
+						<Route path="/admin/*" element={<AdminRoutes />} />
 						<Route path="*" element={<h1>Not Found</h1>} />
 					</Routes>
 				</div>

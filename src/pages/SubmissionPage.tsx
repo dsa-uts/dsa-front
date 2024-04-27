@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { SubAssignmentDropdown, SubAssignmentDetail } from '../types/Assignments';
-import { fetchSubAssignmentDetail, fetchSubAssignments } from '../api/GetAPI';
+import { fetchSubAssignmentDetail, fetchSubAssignments } from '../api/services/GetAPI';
 import Dropdown from '../components/Dropdown';
 import CodeBlock from '../components/CodeBlock';
 import Accordion from '../components/Accordion';
@@ -18,6 +18,9 @@ const SubmissionPage: React.FC = () => {
 	const { token } = useAuth();
 	useEffect(() => {
 		const getSubAssignmentsDropdown = async () => {
+			if (!problemNum || problemNum.trim() === '') {
+				return;
+			}
 			try {
 				const data = await fetchSubAssignments(problemNum ?? '', token);
 				setSubAssignmentsDropdown(data);
@@ -32,19 +35,37 @@ const SubmissionPage: React.FC = () => {
 		getSubAssignmentsDropdown();
 	}, [problemNum]);
 	
-	const handleSelect = async (id: number | null, subId: number | null) => {
-		if (id === null || subId === null) {
-			setSubAssignmentDetail(null);
-			return;
-		}
-		try {
-			const detail = await fetchSubAssignmentDetail(id.toString(), subId.toString(), token);
-			setSubAssignmentDetail(detail);
-			setHasError(false); // 成功した場合はエラー状態をリセット
-		} catch (error) {
-			setHasError(true); // エラーが発生した場合はエラー状態をtrueに
-		}
-	};
+	// const handleSelect = async (id: number | null, subId: number | null) => {
+	// 	if (id === null || subId === null) {
+	// 		setSubAssignmentDetail(null);
+	// 		return;
+	// 	}
+	// 	try {
+	// 		const detail = await fetchSubAssignmentDetail(id.toString(), subId.toString(), token);
+	// 		setSubAssignmentDetail(detail);
+	// 		setHasError(false); // 成功した場合はエラー状態をリセット
+	// 	} catch (error) {
+	// 		setHasError(true); // エラーが発生した場合はエラー状態をtrueに
+	// 	}
+	// };
+	const handleSelect = async (value: string) => {
+        if (!value) {
+            setSubAssignmentDetail(null);
+            return;
+        }
+        const [id, subId] = value.split('-').map(Number);
+        try {
+            const detail = await fetchSubAssignmentDetail(id.toString(), subId.toString(), token);
+            setSubAssignmentDetail(detail);
+        } catch (error) {
+            console.error('Error fetching assignment detail', error);
+        }
+    };
+
+    const dropdownOptions = subAssignmentsDropdown.map(assignment => ({
+        value: `${assignment.id}-${assignment.sub_id}`,
+        label: assignment.title
+    }));
 
 	if (hasError) {
 		// エラーがある場合はNotFoundメッセージを表示
@@ -57,7 +78,8 @@ const SubmissionPage: React.FC = () => {
 	return (
 		<div style={{ paddingBottom: '100px'}}>
 			<h1>課題{problemNum}確認ページ</h1>
-			<Dropdown subAssignmentsDropdown={subAssignmentsDropdown} onSelect={handleSelect} />
+			{/* <Dropdown subAssignmentsDropdown={subAssignmentsDropdown} onSelect={handleSelect} /> */}
+			<Dropdown options={dropdownOptions} onSelect={handleSelect} />
 			{subAssignmentDetail && (
 				<div>
 					<h2>課題詳細</h2>

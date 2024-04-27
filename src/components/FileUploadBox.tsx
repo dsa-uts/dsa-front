@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { uploadFile } from '../api/PostAPI';
-import { startProcessingWithProgress } from '../api/WebSocketAPI';
+import { uploadFile } from '../api/services/PostAPI';
+import { startProcessingWithProgress } from '../api/services/WebSocketAPI';
 import { ProgressMessage } from '../types/Assignments';
 interface FileUploadProps {
     id: number;

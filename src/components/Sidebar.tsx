@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Assignment } from '../types/Assignments';
-import { fetchAssignments } from '../api/GetAPI';
+import { fetchAssignments } from '../api/services/GetAPI';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar: React.FC = () => {
@@ -11,12 +11,15 @@ const Sidebar: React.FC = () => {
 	
 	useEffect(() => {
 		const getAssignments = async () => {
-		const assignmentsData = await fetchAssignments(token);
-		setAssignments(assignmentsData);
+			try {
+				const assignmentsData = await fetchAssignments(token);
+				setAssignments(assignmentsData);
+			} catch (error) {
+				console.error('課題データの取得に失敗しました', error);
+			}
 		};
-
 		getAssignments();
-	}, []);
+	}, [token]);
 	
 	return (
 		<SidebarContainer>
@@ -29,6 +32,11 @@ const Sidebar: React.FC = () => {
 				</Link>
 			</SidebarItem>
 			))}
+			<SidebarItem>
+				<Link to="/users">
+					<h3>ユーザー管理</h3>
+				</Link>
+			</SidebarItem>
 		</SidebarList>
 		{token && <LogoutButton onClick={logout}>ログアウト</LogoutButton>}
 		</SidebarContainer>

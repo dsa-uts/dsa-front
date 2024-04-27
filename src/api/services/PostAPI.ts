@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { LoginCredentials, CreateUser } from '../types/user';
-import { Token } from '../types/token';
-import { ProgressMessage } from '../types/Assignments';
+import { LoginCredentials, CreateUser } from '../../types/user';
+import { Token } from '../../types/token';
+import apiClient from '../ApiClient';
 
 interface UploadResult {
     unique_id: string;
@@ -31,7 +31,8 @@ export const uploadFile = async (file: File, id: number, sub_id: number): Promis
 export const createUser = async (user: CreateUser, token: string | null): Promise<string> => {
     try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await axios.post(`${API_PREFIX}/users/register`, user, { headers });
+        const response = await apiClient.post(`${API_PREFIX}/users/register`, user, { headers });
+        // const response = await axios.post(`${API_PREFIX}/users/register`, user, { headers });
         return response.data.result;
     } catch (error) {
         throw error;
@@ -45,7 +46,8 @@ export const login = async (credentials: LoginCredentials): Promise<Token> => {
     formData.append('password', credentials.password);
 
     try {
-        const response = await axios.post<Token>(`${API_PREFIX}/authorize/token`, formData);
+        const response = await apiClient.post<Token>(`${API_PREFIX}/authorize/token`, formData);
+        // const response = await axios.post<Token>(`${API_PREFIX}/authorize/token`, formData);
         return response.data; 
     } catch (error) {
         throw error;
@@ -55,7 +57,8 @@ export const login = async (credentials: LoginCredentials): Promise<Token> => {
 export const logout = async (token: string): Promise<void> => {
     try {
         const headers = { Authorization: `Bearer ${token}` };
-        await axios.post(`${API_PREFIX}/authorize/logout`, {}, { headers });
+        await apiClient.post(`${API_PREFIX}/authorize/logout`, {}, { headers });
+        // await axios.post(`${API_PREFIX}/authorize/logout`, {}, { headers });
     } catch (error) {
         throw error;
     }

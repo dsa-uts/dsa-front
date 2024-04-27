@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { login } from '../api/PostAPI';
+import { login } from '../api/services/PostAPI';
 import { LoginCredentials } from '../types/user';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
     const [credentials, setCredentials] = useState<LoginCredentials>({ username: '', password: '' });
     const [error, setError] = useState<string>('');
-    const { setToken, setUserId, setIsAdmin } = useAuth();
+    const { token, user_id, setToken, setUserId, setIsAdmin } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -27,6 +27,12 @@ const LoginPage: React.FC = () => {
         }
     };
 
+    if (token && user_id) {
+        window.location.href = '/';
+        return null;
+    }
+
+    
     return (
         <div className="login-page">
             <h2>ログイン</h2>

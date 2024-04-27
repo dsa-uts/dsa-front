@@ -1,4 +1,4 @@
-import { ProgressMessage } from '../types/Assignments';
+import { ProgressMessage } from '../../types/Assignments';
 
 const API_WS_PREFIX = 'ws://localhost:8000/api/v1';
 

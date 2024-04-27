@@ -15,7 +15,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, content }) => {
       <AccordionHeader onClick={() => setIsOpen(!isOpen)}>
         {title} {isOpen ? '▲' : '▼'}
       </AccordionHeader>
-      <AccordionContent isOpen={isOpen}>
+      <AccordionContent $isOpen={isOpen}>
         {content.map((line, index) => (
           <pre key={index} style={{ margin: 0 }}>
             {line}
@@ -41,8 +41,8 @@ const AccordionHeader = styled.div`
   border-bottom: 1px solid #ddd;
 `;
 
-const AccordionContent = styled.div<{ isOpen: boolean }>`
+const AccordionContent = styled.div<{ $isOpen: boolean }>`
+  display: ${({ $isOpen }) => $isOpen ? 'block' : 'none'};
   padding: 10px;
   background-color: #f0f0f0;
-  display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
 `;

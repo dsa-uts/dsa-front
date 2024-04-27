@@ -1,38 +1,33 @@
 import React, { useEffect, useState } from 'react';
 
-const DEFAULT_OPTION = '問題を選択してください';
+const DEFAULT_OPTION = '選択してください';
 interface DropdownProps {
-    subAssignmentsDropdown: { id: number; sub_id: number; title: string }[];
-    onSelect: (id: number | null, subId: number | null) => void;
+    options: { value: string; label: string }[];
+    onSelect: (value: string) => void;
+    defaultValue?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ subAssignmentsDropdown, onSelect }) => {
-    const [selected, setSelected] = useState('');
-    
-    // ページ遷移した時に選択肢をリセット
+const Dropdown: React.FC<DropdownProps> = ({ options, onSelect, defaultValue = '' }) => {
+    const [selected, setSelected] = useState(defaultValue);
+
     useEffect(() => {
-        setSelected('');
-    }, [subAssignmentsDropdown]);
+        setSelected(defaultValue);
+    }, [defaultValue]);
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
         setSelected(value);
-        if (value !== "") {
-        const [id, subId] = value.split('-').map(Number);
-        onSelect(id, subId);
-        } else {
-            onSelect(null, null)
-        }
+        onSelect(value);
     };
 
     return (
         <select value={selected} onChange={handleChange}>
-        <option value="">{DEFAULT_OPTION}</option>
-        {subAssignmentsDropdown.map((assignment) => (
-            <option key={assignment.id} value={`${assignment.id}-${assignment.sub_id}`}>
-            {assignment.title}
-            </option>
-        ))}
+            <option value="">{DEFAULT_OPTION}</option>
+            {options?.map((option) => (
+                <option key={option.value} value={option.value}>
+                    {option.label}
+                </option>
+            ))}
         </select>
     );
 };

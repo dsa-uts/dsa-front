@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import {logout as logoutApi} from '../api/PostAPI';
+import {logout as logoutApi} from '../api/services/PostAPI';
 
 interface AuthContextType {
     token: string | null;
@@ -37,6 +37,18 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         }
     };
 
+    useEffect(() => {
+        const handleTokenUpdate = (event: CustomEvent) => {
+            saveToken(event.detail.newToken);
+        };
+    
+        window.addEventListener('token-update', handleTokenUpdate as EventListener);
+    
+        return () => {
+            window.removeEventListener('token-update', handleTokenUpdate as EventListener);
+        };
+    }, [token]);
+
     const saveUserId = (newUserId: number | null) => {
         setUserId(newUserId);
         if (newUserId === null || newUserId < 0) {
@@ -54,18 +66,35 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     let logoutTimer: ReturnType<typeof setTimeout>;
 
     const logout = () => {
+        if (!token) {
+            return;
+        }
+        console.log('Logging out...');
+        window.location.href = '/';
         logoutApi(token as string);
         saveToken(null);
         saveUserId(null);
         setIsAdmin(false);
-        window.location.href = '/';
+        alert('ログアウトしました。');
     };
+
+    useEffect(() => {
+        const handleLogout = (event: CustomEvent) => {
+            logout();
+        };
+
+        window.addEventListener('logout', handleLogout as EventListener);
+
+        return () => {
+            window.removeEventListener('logout', handleLogout as EventListener);
+        };
+    }, []);
 
     const resetTimer = () => {
         clearTimeout(logoutTimer);
         logoutTimer = setTimeout(() => {
         logout();
-        }, 1000 * 60 * 30); // 30 minutes
+        }, 1000*60*30); // 30 minutes
     };
 
     useEffect(() => {
@@ -75,7 +104,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         return () => {
             clearTimeout(logoutTimer);
         };
-    }, [token]);
+    }, [token, resetTimer]);
 
     return (
         <AuthContext.Provider value={{ token, user_id, is_admin, setToken: saveToken, setUserId: saveUserId, setIsAdmin: saveIsAdmin, resetTimer, logout }}>
