@@ -27,12 +27,31 @@ export const uploadFile = async (file: File, id: number, sub_id: number): Promis
     }
 };
 
+export const updateMakefile = async (makefile: string, id: number, sub_id: number, token: string | null): Promise<string> => {
+    try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await apiClient.post(`${API_PREFIX}/edit/makefile/${id}/${sub_id}`, { makefile }, { headers });
+        return response.data.result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const updateExpectedOutput = async (expected_output: string, id: number, sub_id: number, token: string | null): Promise<string> => {
+    try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await apiClient.post(`${API_PREFIX}/edit/expected_output/${id}/${sub_id}`, { expected_output }, { headers });
+        return response.data.result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // 
 export const createUser = async (user: CreateUser, token: string | null): Promise<string> => {
     try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const response = await apiClient.post(`${API_PREFIX}/users/register`, user, { headers });
-        // const response = await axios.post(`${API_PREFIX}/users/register`, user, { headers });
         return response.data.result;
     } catch (error) {
         throw error;
@@ -47,7 +66,6 @@ export const login = async (credentials: LoginCredentials): Promise<Token> => {
 
     try {
         const response = await apiClient.post<Token>(`${API_PREFIX}/authorize/token`, formData);
-        // const response = await axios.post<Token>(`${API_PREFIX}/authorize/token`, formData);
         return response.data; 
     } catch (error) {
         throw error;
@@ -58,7 +76,6 @@ export const logout = async (token: string): Promise<void> => {
     try {
         const headers = { Authorization: `Bearer ${token}` };
         await apiClient.post(`${API_PREFIX}/authorize/logout`, {}, { headers });
-        // await axios.post(`${API_PREFIX}/authorize/logout`, {}, { headers });
     } catch (error) {
         throw error;
     }

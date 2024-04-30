@@ -1,5 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {logout as logoutApi} from '../api/services/PostAPI';
 
 interface AuthContextType {
@@ -24,6 +25,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+    const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [user_id, setUserId] = useState<number | null>(localStorage.getItem('user_id') ? parseInt(localStorage.getItem('user_id') as string) : null);
     const [is_admin, setIsAdmin] = useState<boolean>(localStorage.getItem('is_admin') === 'true');
@@ -70,11 +72,11 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
             return;
         }
         console.log('Logging out...');
-        window.location.href = '/';
+        navigate('/');
         logoutApi(token as string);
         saveToken(null);
         saveUserId(null);
-        setIsAdmin(false);
+        saveIsAdmin(false);
         alert('ログアウトしました。');
     };
 

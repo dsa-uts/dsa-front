@@ -10,7 +10,9 @@ interface FileUploadProps {
     isProcessing?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgressUpdate, isProcessing }) => {
+
+// ゆくゆくはzipアップロード用のと同じコンポーネントになるように作り替えたい．
+const CFileUploadBox: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgressUpdate, isProcessing }) => {
     const [file, setFile] = useState<File | null>(null);
     const [isNameCorrect, setIsNameCorrect] = useState<boolean | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -97,4 +99,4 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
     );
 };
 
-export default FileUpload;
+export default CFileUploadBox;

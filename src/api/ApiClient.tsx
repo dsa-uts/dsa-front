@@ -11,13 +11,8 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(response => response, async error => {
 
     const currentToken = localStorage.getItem('token');
-    // if (!currentToken) {
-    //     return Promise.reject(error);
-    // }
     
     if (error.response && error.response.status === 401) {
-        // トークンリフレッシュの試み
-        console.log('トークンのリフレッシュを試みます');
         try {
             const refreshResponse = await axios.post(`${API_PREFIX}/authorize/refresh`, {}, { withCredentials: true });
             const newAccessToken = refreshResponse.data.access_token;

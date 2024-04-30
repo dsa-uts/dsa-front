@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Assignment } from '../types/Assignments';
 import { fetchAssignments } from '../api/services/GetAPI';
 import { useAuth } from '../context/AuthContext';
+import useAutoLogout from '../hooks/useAutoLogout';
+import Dropdown from './Dropdown';
 
 const Sidebar: React.FC = () => {
+	useAutoLogout();
 	const { token, logout } = useAuth();
 	const [assignments, setAssignments] = useState<Assignment[]>([]);
+	const navigate = useNavigate();
+
+	const userManagementOptions = [
+		{ value: '/admin/users/register', label: 'ユーザー作成' },
+		{ value: '/admin/users/delete', label: 'ユーザー削除' }
+	];
+	const handleUserManagementSelect = (value: string) => {
+		navigate(value);
+	}
 	
 	useEffect(() => {
 		const getAssignments = async () => {
@@ -23,22 +35,25 @@ const Sidebar: React.FC = () => {
 	
 	return (
 		<SidebarContainer>
-		<SidebarList>
-			<Link to="/"><h3>ホーム</h3></Link>
-			{assignments.map(assignment => (
-			<SidebarItem key={assignment.id}>
-				<Link to={`/submission/${assignment.id}`}>
-				<h3>{assignment.title}</h3>
-				</Link>
-			</SidebarItem>
-			))}
-			<SidebarItem>
-				<Link to="/users">
-					<h3>ユーザー管理</h3>
-				</Link>
-			</SidebarItem>
-		</SidebarList>
-		{token && <LogoutButton onClick={logout}>ログアウト</LogoutButton>}
+			<SidebarList>
+				<Link to="/"><h3>ホーム</h3></Link>
+				{assignments.map(assignment => (
+				<SidebarItem key={assignment.id}>
+					<Link to={`/submission/${assignment.id}`}>
+					<h3>{assignment.title}</h3>
+					</Link>
+				</SidebarItem>
+				))}
+			</SidebarList>
+			{token && (
+						<UserManagementDropdown
+							options={userManagementOptions}
+							onSelect={handleUserManagementSelect}
+							defaultOptionLabel="ユーザー管理"
+						/>
+					)}
+			
+			{token && <LogoutButton onClick={logout}>ログアウト</LogoutButton>}
 		</SidebarContainer>
 	);
 }
@@ -65,11 +80,11 @@ const SidebarItem = styled.li`
 	h3 {
 		margin: 10px 0;
 		&:hover {
-		background-color: #555;
-		color: white;
-		cursor: pointer;
-		padding: 0px 20px 0 30px;
-		margin: 0 -20px 0 -30px;
+			background-color: #555;
+			color: white;
+			cursor: pointer;
+			padding: 0px 20px 0 30px;
+			margin: 0 -20px 0 -30px;
 		}
 	}
 	a, a:visited {
@@ -77,6 +92,7 @@ const SidebarItem = styled.li`
 		text-decoration: none;
 	}
 `;
+
 
 const LogoutButton = styled.h4`
 	margin: 0px 0px 50px 0px;
@@ -92,3 +108,23 @@ const LogoutButton = styled.h4`
 		color: white;
 	}
 `;
+
+
+const UserManagementDropdown = styled(Dropdown)`
+	width: 100%;
+	h3 {
+		padding: 0px;
+		background-color: dimgray; 
+		color: inherit;
+		border: none;
+	}
+    &:hover {
+        background-color: #555;
+		color: white;
+    }
+`;
+// padding: 8px;
+//     border: 1px solid #ccc;
+//     border-radius: 4px;
+//     width: 20%;
+
