@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { uploadFile } from '../api/services/PostAPI';
+import { uploadCFile } from '../api/services/PostAPI';
 import { startProcessingWithProgress } from '../api/services/WebSocketAPI';
 import { ProgressMessage } from '../types/Assignments';
 interface FileUploadProps {
@@ -21,7 +21,7 @@ const CFileUploadBox: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onPro
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsNameCorrect(null);
         const files = event.target.files;
-        processFile(files);
+        checkFileName(files);
     };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -31,11 +31,11 @@ const CFileUploadBox: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onPro
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const files = event.dataTransfer.files;
-        processFile(files);
+        checkFileName(files);
         setError(null);
     };
 
-    const processFile = (files: FileList | null) => {
+    const checkFileName = (files: FileList | null) => {
         if (files && files[0]) {
             const selectedFile = files[0];
             setFile(selectedFile); // Always set the file
@@ -61,7 +61,7 @@ const CFileUploadBox: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onPro
         event.preventDefault();
         if (file && isNameCorrect) {
             try {
-                const upload_result = await uploadFile(file, id, sub_id);
+                const upload_result = await uploadCFile(file, id, sub_id);
                 // WebSocket 通信を開始し、進行状況を受信
                 startProcessingWithProgress(
                     id,

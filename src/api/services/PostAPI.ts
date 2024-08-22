@@ -11,7 +11,7 @@ interface UploadResult {
 
 const API_PREFIX = 'http://localhost:8000/api/v1';
 // ファイルをアップロードする関数(多分uploadFileWithProgressに切り替える)
-export const uploadFile = async (file: File, id: number, sub_id: number): Promise<UploadResult> =>{
+export const uploadCFile = async (file: File, id: number, sub_id: number): Promise<UploadResult> =>{
     const formData = new FormData();
     formData.append("upload_file", file);
     try {
@@ -26,6 +26,19 @@ export const uploadFile = async (file: File, id: number, sub_id: number): Promis
         throw error; // エラーを呼び出し元に伝播させる
     }
 };
+
+export const uploadZipFile = async (file: File, id: number, token: string | null): Promise<UploadResult> =>{
+    const formData = new FormData();
+    formData.append("upload_file", file);
+    try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await apiClient.post(`${API_PREFIX}/assignments/upload/${id}`, formData, { headers });
+        const data = response.data;
+        return data; // uuidが付加されたファイル名を返す
+    } catch (error) {
+        throw error; // エラーを呼び出し元に伝播させる
+    }
+}
 
 export const updateMakefile = async (makefile: string, id: number, sub_id: number, token: string | null): Promise<string> => {
     try {
