@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUser } from '../api/PostAPI';
+import { createUser } from '../api/services/PostAPI';
 import { CreateUser } from '../types/user';
 import {useAuth} from '../context/AuthContext';
 
@@ -11,7 +11,7 @@ const RegisterPage: React.FC = () => {
     const [disabled, setDisabled] = useState(false);
     const [activeStartDate, setActiveStartDate] = useState('');
     const [activeEndDate, setActiveEndDate] = useState('');
-    const { token } = useAuth();
+    const auth = useAuth();
     // const [authCode, setAuthCode] = useState('');
     const [error, setError] = useState('');
 
@@ -38,7 +38,7 @@ const RegisterPage: React.FC = () => {
         };
 
         try {
-            await createUser(newUser, token);
+            await createUser(newUser, auth.token);
             alert('アカウントが正常に作成されました。');
             setUsername('');
             setPassword('');
@@ -54,6 +54,13 @@ const RegisterPage: React.FC = () => {
             setError(`アカウントの作成に失敗しました: ${(error as any).response.data.detail}`);
         }
     };
+
+    if (auth.user_id === null) {
+        return <p>ログインしていません。</p>;
+    }
+    if (!auth.is_admin) {
+        return <p>管理者権限がありません。</p>;
+    }
 
     return (
         <div>

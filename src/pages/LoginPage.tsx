@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { login } from '../api/PostAPI';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../api/services/PostAPI';
 import { LoginCredentials } from '../types/user';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
     const [credentials, setCredentials] = useState<LoginCredentials>({ username: '', password: '' });
     const [error, setError] = useState<string>('');
-    const { setToken, setUserId, setIsAdmin } = useAuth();
+    const navigate = useNavigate();
+    const { token, user_id, setToken, setUserId, setIsAdmin } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -20,13 +22,19 @@ const LoginPage: React.FC = () => {
             setToken(result.access_token); 
             setUserId(result.user_id);
             setIsAdmin(result.is_admin); 
-            window.location.href = '/';
+            navigate('/');
         } catch (error) {
             console.error('Login failed:', error);
             setError(`ログインに失敗しました。: ${(error as any).response.data.detail}`);
         }
     };
 
+    if (token && user_id) {
+        navigate('/');
+        return null;
+    }
+
+    
     return (
         <div className="login-page">
             <h2>ログイン</h2>

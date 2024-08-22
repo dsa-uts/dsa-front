@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserList } from '../api/GetAPI';
+import { fetchUserList } from '../api/services/GetAPI';
 import { User } from '../types/user';
 import { useAuth } from '../context/AuthContext';
-import { deleteUsers } from '../api/DeleteAPI';
+import { deleteUsers } from '../api/services/DeleteAPI';
 import { UserList } from '../components/UserList';
-import { UserDelete } from '../types/user';
 
 const UserDeletePage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);

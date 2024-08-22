@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { uploadFile } from '../api/PostAPI';
-import { startProcessingWithProgress } from '../api/WebSocketAPI';
+import { uploadCFile } from '../api/services/PostAPI';
+import { startProcessingWithProgress } from '../api/services/WebSocketAPI';
 import { ProgressMessage } from '../types/Assignments';
 interface FileUploadProps {
     id: number;
@@ -10,7 +10,9 @@ interface FileUploadProps {
     isProcessing?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgressUpdate, isProcessing }) => {
+
+// ゆくゆくはzipアップロード用のと同じコンポーネントになるように作り替えたい．
+const CFileUploadBox: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgressUpdate, isProcessing }) => {
     const [file, setFile] = useState<File | null>(null);
     const [isNameCorrect, setIsNameCorrect] = useState<boolean | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -19,7 +21,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsNameCorrect(null);
         const files = event.target.files;
-        processFile(files);
+        checkFileName(files);
     };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -29,11 +31,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const files = event.dataTransfer.files;
-        processFile(files);
+        checkFileName(files);
         setError(null);
     };
 
-    const processFile = (files: FileList | null) => {
+    const checkFileName = (files: FileList | null) => {
         if (files && files[0]) {
             const selectedFile = files[0];
             setFile(selectedFile); // Always set the file
@@ -59,7 +61,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
         event.preventDefault();
         if (file && isNameCorrect) {
             try {
-                const upload_result = await uploadFile(file, id, sub_id);
+                const upload_result = await uploadCFile(file, id, sub_id);
                 // WebSocket 通信を開始し、進行状況を受信
                 startProcessingWithProgress(
                     id,
@@ -97,4 +99,4 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, sub_id, fileName, onProgres
     );
 };
 
-export default FileUpload;
+export default CFileUploadBox;

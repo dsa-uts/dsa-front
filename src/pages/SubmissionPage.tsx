@@ -1,23 +1,35 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { SubAssignmentDropdown, SubAssignmentDetail } from '../types/Assignments';
-import { fetchSubAssignmentDetail, fetchSubAssignments } from '../api/GetAPI';
+import { fetchSubAssignmentDetail, fetchSubAssignments } from '../api/services/GetAPI';
+import { updateMakefile } from '../api/services/PostAPI';
 import Dropdown from '../components/Dropdown';
 import CodeBlock from '../components/CodeBlock';
 import Accordion from '../components/Accordion';
-import FileUploadBox from '../components/FileUploadBox';
 import {useAuth} from '../context/AuthContext';
 import { ProgressMessage } from '../types/Assignments';
 import ProgressBar from '../components/ProgressBar';
+import CFileUploadBox from '../components/CFileUploadBox';
+import Header from '../components/Header';
+import CodeBlockManager from '../components/CodeBlockManager';
+import { FlexRow } from '../styles/FlexRow';
+
 const SubmissionPage: React.FC = () => {
 	const { problemNum } = useParams<{ problemNum: string }>();
 	const [subAssignmentsDropdown, setSubAssignmentsDropdown] = useState<SubAssignmentDropdown[]>([]);
 	const [subAssignmentDetail, setSubAssignmentDetail] = useState<SubAssignmentDetail | null>(null);
 	const [progressMessage, setProgressMessage] = useState<ProgressMessage | null>(null);
 	const [hasError, setHasError] = useState(false);
-	const { token } = useAuth();
+	const navigate = useNavigate();
+	const { token, is_admin } = useAuth();
+
+	const [editMakefile, setEditMakefile] = useState(false);
 	useEffect(() => {
 		const getSubAssignmentsDropdown = async () => {
+			if (!problemNum || problemNum.trim() === '') {
+				return;
+			}
 			try {
 				const data = await fetchSubAssignments(problemNum ?? '', token);
 				setSubAssignmentsDropdown(data);
@@ -31,20 +43,25 @@ const SubmissionPage: React.FC = () => {
 		setSubAssignmentDetail(null);
 		getSubAssignmentsDropdown();
 	}, [problemNum]);
-	
-	const handleSelect = async (id: number | null, subId: number | null) => {
-		if (id === null || subId === null) {
-			setSubAssignmentDetail(null);
-			return;
-		}
-		try {
-			const detail = await fetchSubAssignmentDetail(id.toString(), subId.toString(), token);
-			setSubAssignmentDetail(detail);
-			setHasError(false); // 成功した場合はエラー状態をリセット
-		} catch (error) {
-			setHasError(true); // エラーが発生した場合はエラー状態をtrueに
-		}
-	};
+
+	const handleSelect = async (value: string) => {
+        if (!value) {
+            setSubAssignmentDetail(null);
+            return;
+        }
+        const [id, subId] = value.split('-').map(Number);
+        try {
+            const detail = await fetchSubAssignmentDetail(id.toString(), subId.toString(), token);
+            setSubAssignmentDetail(detail);
+        } catch (error) {
+            console.error('Error fetching assignment detail', error);
+        }
+    };
+
+    const dropdownOptions = subAssignmentsDropdown.map(assignment => ({
+        value: `${assignment.id}-${assignment.sub_id}`,
+        label: assignment.title
+    }));
 
 	if (hasError) {
 		// エラーがある場合はNotFoundメッセージを表示
@@ -56,14 +73,12 @@ const SubmissionPage: React.FC = () => {
 
 	return (
 		<div style={{ paddingBottom: '100px'}}>
-			<h1>課題{problemNum}確認ページ</h1>
-			<Dropdown subAssignmentsDropdown={subAssignmentsDropdown} onSelect={handleSelect} />
+			<Header problemNum={Number(problemNum)} is_admin={is_admin ? true : false} is_grading_page={false} />
+			<Dropdown options={dropdownOptions} onSelect={handleSelect} />
 			{subAssignmentDetail && (
 				<div>
 					<h2>課題詳細</h2>
-					<h3>使用するmakefile</h3>
-					<p>※提出された関数ファイルはテスト用のmainファイルと以下のmakefileを使ってコンパイルされます。</p>
-					<CodeBlock lines={subAssignmentDetail.makefile.split('\n')} />
+					<CodeBlockManager title="使用するmakefile" initialLine={subAssignmentDetail.makefile} canEdit={is_admin} onSave={(makefile: string) => {updateMakefile(makefile, subAssignmentDetail.id, subAssignmentDetail.sub_id, token)}} onCancel={() => {}} />
 					<h3>提出するファイル名</h3>
 					<p>以下のファイルを提出してください．</p>
 					<ul>
@@ -75,15 +90,24 @@ const SubmissionPage: React.FC = () => {
 					) : (
 						<div style={{ color: 'red' }}>データの取得に失敗しました．リロードしても失敗する場合はTAに連絡してください．</div>
 					)}
-					<h3>期待する出力</h3>
+					<FlexRow>
+						<h3>期待する出力</h3>
+						<button onClick={() => navigate(`/admin/edit/test_case/${subAssignmentDetail.id}/${subAssignmentDetail.sub_id}`)}>テストケース編集</button>
+					</FlexRow>
 					{subAssignmentDetail.test_output ? (
-						<CodeBlock lines={subAssignmentDetail.test_output.split('\n')} />
+						<CodeBlock line={subAssignmentDetail.test_output} />
 					) : (
 						<div style={{ color : 'red' }}>データの取得に失敗しました．リロードしても失敗する場合はTAに連絡してください．</div>
 					)}
 					<h3>提出</h3>
 					<p>指定されたファイルを選択し，アップロードしてください．ファイルはドラッグ&ドロップでも選択可能です．</p>
-					<FileUploadBox id={subAssignmentDetail.id} sub_id={subAssignmentDetail.sub_id} fileName={subAssignmentDetail.required_file_name} onProgressUpdate={setProgressMessage} isProcessing={!!progressMessage && progressMessage.progress_percentage >= 0 && progressMessage.progress_percentage < 100}/>
+					<CFileUploadBox 
+						id={subAssignmentDetail.id} 
+						sub_id={subAssignmentDetail.sub_id} 
+						fileName={subAssignmentDetail.required_file_name} 
+						onProgressUpdate={setProgressMessage} 
+						isProcessing={!!progressMessage && progressMessage.progress_percentage >= 0 && progressMessage.progress_percentage < 100}
+					/>
 					{progressMessage && <ProgressBar progress={progressMessage} />}
 				</div>
 			)}
@@ -93,3 +117,4 @@ const SubmissionPage: React.FC = () => {
 };
 
 export default SubmissionPage;
+
