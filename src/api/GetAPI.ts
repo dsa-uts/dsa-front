@@ -5,7 +5,7 @@ import { Token } from '../types/token';
 import { TextResponse } from '../types/response'
 import JSZip from 'jszip';
 
-const API_PREFIX = 'http://localhost:8000/api/v1';
+const API_PREFIX = 'https://dsa-jikken.jp/api/v1';
 
 // "/api/v1/assignments/info?open={true|false}"を通して、{公開期間内|公開期間外}の授業エントリを全て取得する関数
 export const fetchLectures = async (open: boolean, token: string | null): Promise<Lecture[]> => {

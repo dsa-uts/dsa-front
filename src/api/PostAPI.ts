@@ -9,7 +9,7 @@ interface UploadResult {
     result: string;
 }
 
-const API_PREFIX = 'http://localhost:8000/api/v1';
+const API_PREFIX = 'https://dsa-jikken.jp/api/v1';
 
 // "/api/v1/assignments/judge/{lecture_id}/{assignment_id}/?evaluation={true|false}"を通して、課題のジャッジリクエストを送信する関数
 export const submitAssignment = async (lecture_id: number, assignment_id: number, evaluation: boolean, files: File[], token: string | null) : Promise<SubmissionRecord> => {
