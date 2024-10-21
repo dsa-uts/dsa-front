@@ -158,6 +158,15 @@ const BatchUserDetail: React.FC = () => {
       )}
 
       <h2>チェックリスト ({selectedId !== null && problems[selectedId]?.title})</h2>
+
+      {selectedId !== null && (
+        <div>
+          <h2>メッセージ</h2>
+          <p>{evaluationStatus?.submissions[selectedId]?.message || 'なし'}</p>
+          <p>{'detail: ' + evaluationStatus?.submissions[selectedId]?.detail || ''}</p>
+        </div>
+      )}
+      
       <CheckListTable>
         <thead>
           <tr>
