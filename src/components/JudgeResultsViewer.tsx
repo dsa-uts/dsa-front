@@ -54,7 +54,7 @@ const JudgeResultsViewer: React.FC<JudgeResultsViewerProps> = ({ result, testCas
         </IOContainer>
         <ExitCodeContainer>
           <p>Exit code: {result.exit_code}</p>
-          <p>Exit code (expected): {testCase.exit_code || 'No expected exit code'}</p>
+          <p>Exit code (expected): {testCase.exit_code === 0 ? '0' : 'Non-zero'}</p>
         </ExitCodeContainer>
       </JudgeResultContainer>
     </div>
