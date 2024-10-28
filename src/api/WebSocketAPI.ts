@@ -1,6 +1,6 @@
 import { ProgressMessage } from '../types/Assignments';
 
-const API_WS_PREFIX = 'ws://localhost:8000/api/v1';
+const API_WS_PREFIX = 'wss://dsa-jikken.jp/api/v1';
 
 interface WebSocketCallbacks {
     onProgress: (progress: ProgressMessage) => void;
