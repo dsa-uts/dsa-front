@@ -11,7 +11,6 @@ interface UploadResult {
     result: string;
 }
 
-
 // "/api/v1/assignments/judge/{lecture_id}/{assignment_id}/?eval={true|false}"を通して、課題のジャッジリクエストを送信する関数
 // eval=Trueの場合は、採点リソースも使用して採点を行う
 export const submitAssignment = async (lecture_id: number, assignment_id: number, evaluation: boolean, files: File[], token: string | null) : Promise<Submission> => {
