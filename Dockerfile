@@ -12,6 +12,7 @@ WORKDIR /app
 # COPY . .
 # RUN rm -rf .venv .vnodeenv node_modules
 
-EXPOSE 3000
+RUN npm install -g serve
+RUN apt-get update && apt-get install -y xsel --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-CMD ["npm", "start"]
+EXPOSE 3000
