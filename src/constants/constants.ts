@@ -1,1 +1,1 @@
-export const API_PREFIX = 'http://localhost/api/v1'
+export const API_PREFIX = 'https://dsa-jikken.jp/api/v1'
